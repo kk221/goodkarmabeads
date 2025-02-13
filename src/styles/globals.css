@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 211, 174, 139;
+  --background-start-rgb: 29, 42, 58;
+  --background-end-rgb: 17, 24, 39;
+}
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+  min-height: 100vh;
+}
+
+/* Typography */
+.font-playfair {
+  font-family: var(--font-playfair), serif;
+}
+
+/* Custom animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Custom utilities */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hover-lift {
+  transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(var(--background-start-rgb));
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--foreground-rgb));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--foreground-rgb), 0.8);
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(42, 59, 79, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(211, 174, 139, 0.1);
+}
+
+/* Loading animation */
+.loading {
+  position: relative;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background: rgb(var(--foreground-rgb));
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  50.1% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+
+/* Card styles */
+.card {
+  @apply bg-[#2a3b4f] rounded-xl overflow-hidden shadow-lg transition-all duration-300;
+}
+
+.card:hover {
+  @apply transform -translate-y-1 shadow-xl;
+}
+
+/* Button styles */
+.btn {
+  @apply px-6 py-2 rounded-lg transition-all duration-300;
+}
+
+.btn-primary {
+  @apply bg-[#d3ae8b] text-[#1d2a3a] hover:bg-[#d3ae8b]/90;
+}
+
+.btn-secondary {
+  @apply border border-[#d3ae8b] text-[#d3ae8b] hover:bg-[#d3ae8b] hover:text-[#1d2a3a];
+}
+
+/* Input styles */
+.input {
+  @apply w-full px-4 py-2 bg-[#1d2a3a] border border-[#d3ae8b]/20 rounded-lg 
+         focus:border-[#d3ae8b] focus:ring-1 focus:ring-[#d3ae8b] outline-none 
+         transition-colors placeholder-[#d3ae8b]/50;
+}
+
+/* Grid layouts */
+.grid-auto-fit {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Responsive container */
+.container {
+  @apply px-4 mx-auto max-w-7xl;
+}
+
+/* Section spacing */
+.section {
+  @apply py-20;
+}
+
+/* Divider */
+.divider {
+  @apply h-px w-full bg-gradient-to-r from-transparent via-[#d3ae8b]/20 to-transparent my-8;
+}
+
+/* Star background */
+.stars {
+  @apply fixed inset-0 pointer-events-none;
+  background-image: radial-gradient(2px 2px at 20px 30px, #d3ae8b, rgba(0,0,0,0)),
+                   radial-gradient(2px 2px at 40px 70px, #d3ae8b, rgba(0,0,0,0)),
+                   radial-gradient(2px 2px at 50px 160px, #d3ae8b, rgba(0,0,0,0));
+  background-size: 200px 200px;
+  animation: twinkle 4s infinite;
+}
+
+/* Responsive text */
+@responsive {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Star animation */
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #d3ae8b;
+  border-radius: 50%;
+  opacity: 0;
+  animation: twinkle 3s infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
