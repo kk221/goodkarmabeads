@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import prisma from '@/lib/db/prisma'
 import { getServerSession } from 'next-auth'
 import Stripe from 'stripe'
 
