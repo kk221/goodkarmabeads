@@ -1,24 +1,24 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import * as THREE from 'three'
-import { useFrame } from '@react-three/fiber'
-import { Canvas } from '@react-three/fiber'
-import { zodiacSymbols } from '@/lib/constants'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { Text3D, Center } from '@react-three/drei'
+import { zodiacSymbols } from '@/lib/utils/constants'
 
 function Stars({ count = 5000 }) {
   const mesh = useRef()
   const positions = new Float32Array(count * 3)
-  
-  for(let i = 0; i < count * 3; i += 3) {
-    positions[i] = (Math.random() - 0.5) * 100
-    positions[i + 1] = (Math.random() - 0.5) * 100
-    positions[i + 2] = (Math.random() - 0.5) * 100
+
+  for (let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 2000
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 2000
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 2000
   }
 
-  useFrame((state, delta) => {
-    mesh.current.rotation.x += delta * 0.05
-    mesh.current.rotation.y += delta * 0.075
+  useFrame((state) => {
+    mesh.current.rotation.x += 0.0001
+    mesh.current.rotation.y += 0.0001
   })
 
   return (
@@ -32,52 +32,57 @@ function Stars({ count = 5000 }) {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.1}
+        size={1.5}
+        sizeAttenuation={true}
         color="#d3ae8b"
         transparent
         opacity={0.8}
-        sizeAttenuation
       />
     </points>
   )
 }
 
-function FloatingZodiacSigns() {
+function ZodiacSymbols() {
   const group = useRef()
-  
+
   useFrame((state) => {
     group.current.rotation.y += 0.001
-    group.current.children.forEach((child, i) => {
-      child.position.y = Math.sin(state.clock.elapsedTime + i) * 0.5
-    })
   })
 
   return (
     <group ref={group}>
-      {zodiacSymbols.map((symbol, i) => (
-        <mesh
-          key={i}
-          position={[
-            Math.cos((i / 12) * Math.PI * 2) * 20,
-            0,
-            Math.sin((i / 12) * Math.PI * 2) * 20
-          ]}
-        >
-          <textGeometry args={[symbol, { size: 2, height: 0.1 }]} />
-          <meshStandardMaterial color="#d3ae8b" />
-        </mesh>
-      ))}
+      {zodiacSymbols.map((zodiac, index) => {
+        const angle = (index / zodiacSymbols.length) * Math.PI * 2
+        const radius = 100
+        const x = Math.cos(angle) * radius
+        const z = Math.sin(angle) * radius
+
+        return (
+          <Center key={zodiac.name} position={[x, 0, z]}>
+            <Text3D
+              font="/fonts/helvetiker_regular.typeface.json"
+              size={10}
+              height={2}
+              curveSegments={12}
+            >
+              {zodiac.symbol}
+              <meshStandardMaterial color="#d3ae8b" />
+            </Text3D>
+          </Center>
+        )
+      })}
     </group>
   )
 }
 
 export default function StarryBackground() {
   return (
-    <div className="fixed inset-0 -z-10">
-      <Canvas camera={{ position: [0, 0, 30] }}>
+    <div className="fixed inset-0 pointer-events-none">
+      <Canvas camera={{ position: [0, 0, 200], fov: 75 }}>
         <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} />
         <Stars />
-        <FloatingZodiacSigns />
+        <ZodiacSymbols />
       </Canvas>
     </div>
   )
