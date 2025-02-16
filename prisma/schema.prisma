@@ -1,29 +1,51 @@
-model Product {
-  id          String        @id @default(cuid())
-  name        String
-  description String
-  price       Float
-  image       String
-  category    String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  OrderItem   OrderItem[]
+generator client {
+  provider = "prisma-client-js"
 }
 
-model Order {
-  id        String      @id @default(cuid())
-  total     Float
-  status    String
-  items     OrderItem[]
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+datasource db {
+  provider = "postgresql"
+  url      = env("postgres://postgres.xlypfmllwmwmgeepsnvk:aZV9LOyuJrcGwGks@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=require&supa=base-pooler.x")
 }
 
-model OrderItem {
+model User {
   id        String   @id @default(cuid())
-  quantity  Int
-  product   Product  @relation(fields: [productId], references: [id])
-  productId String
-  order     Order    @relation(fields: [orderId], references: [id])
-  orderId   String
+  email     String   @unique
+  name      String?
+  birthDate DateTime?
+  zodiacSign String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  readings  Reading[]
+  subscriptions Subscription[]
 }
+
+model Reading {
+  id        String   @id @default(cuid())
+  type      String   // "horoscope", "tarot", "feng-shui"
+  content   String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  type      String   // "one-time", "ten-times", "monthly", "yearly"
+  status    String   // "active", "expired", "cancelled"
+  startDate DateTime @default(now())
+  endDate   DateTime?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Horoscope {
+  id        String   @id @default(cuid())
+  sign      String
+  content   String
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
