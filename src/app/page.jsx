@@ -2,10 +2,12 @@
 
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
-import StarryBackground from '@/components/shared/StarryBackground'
-import DailyOracle from '@/components/home/DailyOracle'
-import DivinationCarousel from '@/components/home/DivinationCarousel'
-import NewsletterForm from '@/components/newsletter/NewsletterForm'
+
+import StarryBackground from '/src/components/shared/StarryBackground'
+import DailyOracle from '/src/components/home/DailyOracle'
+import DivinationCarousel from '/src/components/home/DivinationCarousel'
+import NewsletterForm from '/src/components/newsletter/NewsletterForm'
+
 
 export default function Home() {
   return (
