@@ -3,17 +3,16 @@
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 
-import StarryBackground from '/src/components/shared/StarryBackground'
-import DailyOracle from '/src/components/home/DailyOracle'
-import DivinationCarousel from '/src/components/home/DivinationCarousel'
-import NewsletterForm from '/src/components/newsletter/NewsletterForm'
-
+import { StarsBackground } from '../components/shared/StarryBackground'
+import DailyOracle from '../components/home/DailyOracle'
+import DivinationCarousel from '../components/home/DivinationCarousel'
+import NewsletterForm from '../components/newsletter/NewsletterForm'
 
 export default function Home() {
   return (
     <main className="relative min-h-screen bg-[#1d2a3a] text-white overflow-hidden">
       {/* Background */}
-      <StarryBackground />
+      <StarsBackground />
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center">
@@ -61,9 +60,7 @@ export default function Home() {
                 className="block p-6 bg-[#2a3b4f] rounded-xl text-center hover:bg-[#2a3b4f]/80 transition-colors"
               >
                 <span className="text-4xl mb-4 block">{item.icon}</span>
-                <h3 className="text-xl font-playfair text-[#d3ae8b]">
-                  {item.title}
-                </h3>
+                <h3 className="text-xl font-playfair text-[#d3ae8b]">{item.title}</h3>
               </motion.a>
             ))}
           </div>

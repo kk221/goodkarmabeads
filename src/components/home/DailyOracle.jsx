@@ -1,112 +1,130 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React, { useState } from "react"
+import { zodiacSigns } from "../shared/ZodiacSigns"
+import { FortuneCard } from "./FortuneCard"
+import { Button } from "../ui/button"
+import { Sparkles } from "lucide-react"
 
-const oracleMessages = [
-  {
-    message: "Trust your intuition today. The answers you seek are within.",
-    crystal: "Amethyst",
-    element: "Air",
-    direction: "North"
-  },
-  {
-    message: "A period of transformation approaches. Embrace the change.",
-    crystal: "Citrine",
-    element: "Fire",
-    direction: "South"
-  },
-  {
-    message: "Your spiritual path is illuminated. Take the next step forward.",
-    crystal: "Clear Quartz",
-    element: "Spirit",
-    direction: "Center"
-  }
-  // Add more messages as needed
-]
+/**
+ * @typedef {Object} DailyFortune
+ * @property {string} zodiacInfluence
+ * @property {string[]} positiveEnergies
+ * @property {string|string[]} awareness
+ * @property {Object} lucky
+ * @property {number} lucky.number
+ * @property {string} lucky.time
+ * @property {string} lucky.color
+ */
 
 export default function DailyOracle() {
-  const [oracle, setOracle] = useState(null)
-  const [isRevealed, setIsRevealed] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedSign, setSelectedSign] = useState("")
+  const [dailyFortune, setDailyFortune] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  useEffect(() => {
-    // Get today's date to ensure same oracle for the whole day
-    const today = new Date().toDateString()
-    const index = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % oracleMessages.length
-    setOracle(oracleMessages[index])
-  }, [])
+  const fetchHoroscope = async (sign) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      setDailyFortune(null)
+      
+      const response = await fetch(`/api/horoscope?sign=${sign}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch horoscope')
+      }
+      const data = await response.json()
+      setDailyFortune(data)
+      setIsModalOpen(true)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-  if (!oracle) return null
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (selectedSign) {
+      await fetchHoroscope(selectedSign)
+    }
+  }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="bg-[#2a3b4f] rounded-xl p-8 text-center relative overflow-hidden"
-      >
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#d3ae8b]/20 to-transparent" />
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#d3ae8b]/20 to-transparent" />
+    <div className="w-full max-w-2xl mx-auto p-4">
+      <form onSubmit={handleSubmit} className="space-y-4" id="horoscopeForm" name="horoscopeForm">
+        <fieldset>
+          <legend className="sr-only">Choose your zodiac sign</legend>
+          <div className="grid grid-cols-4 gap-2">
+            {zodiacSigns.map((zodiac) => (
+              <div key={zodiac.sign}>
+                <input
+                  type="radio"
+                  id={zodiac.sign}
+                  name="zodiacSign"
+                  value={zodiac.sign}
+                  checked={selectedSign === zodiac.sign}
+                  onChange={(e) => setSelectedSign(e.target.value)}
+                  className="sr-only"
+                  aria-label={`Select ${zodiac.name}`}
+                />
+                <label htmlFor={zodiac.sign}>
+                  <Button
+                    type="button"
+                    variant={selectedSign === zodiac.sign ? "default" : "outline"}
+                    className={`
+                      flex flex-col items-center p-2 h-auto zodiac-button w-full
+                      ${selectedSign === zodiac.sign 
+                        ? 'bg-[#d3ae8b] text-[#1d2a3a]' 
+                        : 'bg-[#2a3b4f] text-[#d3ae8b]/80 hover:text-[#d3ae8b]'
+                      }
+                    `}
+                    onClick={() => setSelectedSign(zodiac.sign)}
+                    aria-pressed={selectedSign === zodiac.sign}
+                  >
+                    <span className="text-xl" aria-hidden="true">{zodiac.symbol}</span>
+                    <span className="text-xs mt-1">{zodiac.name}</span>
+                    <span className="text-[10px] opacity-75 mt-0.5">{zodiac.dates}</span>
+                  </Button>
+                </label>
+              </div>
+            ))}
+          </div>
+        </fieldset>
         
-        <AnimatePresence mode="wait">
-          {!isRevealed ? (
-            <motion.div
-              key="unrevealed"
-              exit={{ opacity: 0, y: -20 }}
-              className="space-y-6"
-            >
-              <h3 className="text-xl font-playfair text-[#d3ae8b]">
-                Your Daily Oracle Awaits
-              </h3>
-              <p className="text-[#d3ae8b]/80">
-                Center yourself and click to receive today's guidance
-              </p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsRevealed(true)}
-                className="px-6 py-3 bg-[#d3ae8b] text-[#1d2a3a] rounded-lg font-semibold"
-              >
-                Reveal Message
-              </motion.button>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="revealed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
-            >
-              <div className="text-2xl font-playfair text-[#d3ae8b] leading-relaxed">
-                "{oracle.message}"
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-[#d3ae8b]/80">
-                <div>
-                  <p className="text-sm uppercase tracking-wide">Crystal</p>
-                  <p className="font-semibold">{oracle.crystal}</p>
-                </div>
-                <div>
-                  <p className="text-sm uppercase tracking-wide">Element</p>
-                  <p className="font-semibold">{oracle.element}</p>
-                </div>
-                <div>
-                  <p className="text-sm uppercase tracking-wide">Direction</p>
-                  <p className="font-semibold">{oracle.direction}</p>
-                </div>
-              </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsRevealed(false)}
-                className="px-6 py-3 border border-[#d3ae8b] text-[#d3ae8b] rounded-lg font-semibold hover:bg-[#d3ae8b] hover:text-[#1d2a3a] transition-colors"
-              >
-                Draw Another
-              </motion.button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+        <Button 
+          type="submit" 
+          id="submitHoroscope"
+          name="submitHoroscope"
+          className={`
+            w-full max-w-md mx-auto mt-8 py-4 flex items-center justify-center gap-2
+            bg-[#d3ae8b] text-[#1d2a3a] hover:bg-[#d3ae8b]/90 
+            transition-all duration-300 ease-in-out
+            ${!selectedSign ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+          `}
+          disabled={!selectedSign || isLoading}
+          aria-label="Get your daily fortune"
+        >
+          <Sparkles className={`w-5 h-5 ${isLoading ? 'animate-spin' : 'animate-pulse'}`} aria-hidden="true" />
+          <span className="text-lg font-medium">
+            {isLoading ? "Reading the stars..." : "Get Your Daily Fortune"}
+          </span>
+        </Button>
+      </form>
+
+      {error && (
+        <p role="alert" className="text-red-500 mt-4 text-center">{error}</p>
+      )}
+
+      {dailyFortune && isModalOpen && (
+        <FortuneCard
+          fortune={dailyFortune}
+          selectedSign={selectedSign}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   )
 }
+

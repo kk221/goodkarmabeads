@@ -33,9 +33,9 @@ function Stars({ count = 5000 }) {
   )
 }
 
-export default function StarryBackground() {
+export function StarsBackground() {
   return (
-    <div className="fixed inset-0 pointer-events-none">
+    <div className="fixed inset-0 z-0">
       <Canvas camera={{ position: [0, 0, 1] }}>
         <Stars />
       </Canvas>
