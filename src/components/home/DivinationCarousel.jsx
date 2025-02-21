@@ -9,29 +9,25 @@ const readings = [
     id: 1,
     title: 'Tarot Reading',
     description: 'Discover insights through ancient tarot wisdom',
-    image: '/images/tarot-reading.svg',
-    price: 49.99
+    image: '/images/tarot-reading.svg'
   },
   {
     id: 2,
     title: 'Birth Chart Analysis',
     description: 'Understand your celestial blueprint',
-    image: '/images/birth-chart.svg',
-    price: 79.99
+    image: '/images/birth-chart.svg'
   },
   {
     id: 3,
     title: 'Feng Shui Consultation',
     description: 'Harmonize your space and energy',
-    image: '/images/feng-shui.svg',
-    price: 89.99
+    image: '/images/feng-shui.svg'
   },
   {
     id: 4,
-    title: 'Zodiac Compatibility',
-    description: 'Explore relationship dynamics',
-    image: '/images/daily-zodiac.svg',
-    price: 59.99
+    title: 'Lucky Draw',
+    description: 'Unveil your fortune through mystical numbers and symbols',
+    image: '/images/lucky-draw.svg'
   }
 ]
 
@@ -122,7 +118,7 @@ export default function DivinationCarousel() {
                   whileTap={{ scale: 0.95 }}
                   className="px-6 py-2 bg-[#d3ae8b] text-[#1d2a3a] rounded-lg font-semibold"
                 >
-                  Book Now - ${readings[currentIndex].price}
+                  Book Now
                 </motion.button>
               </div>
             </div>

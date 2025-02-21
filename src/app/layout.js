@@ -8,6 +8,9 @@ export const metadata = {
   title: "Good Karma Beads",
   description:
     "Discover your cosmic journey with personalized zodiac, horoscope, tarot, birth-chart, and feng-shui readings.",
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({ children }) {

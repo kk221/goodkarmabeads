@@ -1,133 +1,186 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { useSession } from 'next-auth/react'
+import { useSession, signIn } from 'next-auth/react'
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Checkbox } from "../ui/checkbox"
+import { PlusCircle, X } from 'lucide-react'
 
 const plans = [
   {
-    id: 'single',
-    name: 'Single Reading',
-    price: 9.99,
+    name: "Divine Moment",
+    price: "5.99",
     features: [
-      'One detailed reading of your choice',
-      'PDF download',
-      'Valid for 30 days',
-      'Email support'
-    ],
-    popular: false
+      "Daily Oracle Reading",
+      "Basic Birth Chart",
+      "Limited Tarot Spreads",
+      "Email Support"
+    ]
   },
   {
-    id: '10pack',
-    name: '10 Readings Pack',
-    price: 79.99,
+    name: "Mystic Flow",
+    price: "19.99",
     features: [
-      '10 readings of your choice',
-      'PDF downloads',
-      'Valid for 90 days',
-      'Priority email support',
-      '20% savings vs single readings'
-    ],
-    popular: true
+      "All Basic Features",
+      "Advanced Birth Chart Analysis",
+      "Full Tarot Deck Access",
+      "Priority Email Support",
+      "Monthly Personal Reading"
+    ]
   },
   {
-    id: 'monthly',
-    name: 'Monthly Access',
-    price: 29.99,
+    name: "Infinite Wisdom",
+    price: "89.99",
     features: [
-      'Unlimited readings',
-      'Weekly newsletters',
-      'PDF downloads',
-      'Priority support',
-      'Exclusive monthly content',
-      'Cancel anytime'
-    ],
-    popular: false
-  },
-  {
-    id: 'yearly',
-    name: 'Yearly Access',
-    price: 299.99,
-    features: [
-      'All Monthly Access features',
-      'Two months free',
-      'Personal consultation',
-      'Early access to new features',
-      'Exclusive workshops',
-      'VIP support'
-    ],
-    popular: false
+      "All Premium Features",
+      "1-on-1 Spiritual Guidance",
+      "Custom Birth Chart Reports",
+      "Unlimited Readings",
+      "24/7 Priority Support",
+      "Exclusive Spiritual Events"
+    ]
   }
+]
+
+const defaultInterests = [
+  { id: 'zodiac', label: 'Zodiac' },
+  { id: 'birthchart', label: 'Birth Chart' },
+  { id: 'tarot', label: 'Tarot' },
+  { id: 'fengshui', label: 'Feng Shui' },
+  { id: 'luckydraw', label: 'Lucky Draw' }
 ]
 
 export default function SubscriptionPlans() {
   const { data: session } = useSession()
-  const [selectedPlan, setSelectedPlan] = useState(null)
+  const [email, setEmail] = useState(session?.user?.email || '')
+  const [interests, setInterests] = useState(defaultInterests)
+  const [selectedInterests, setSelectedInterests] = useState([])
+  const [newInterest, setNewInterest] = useState('')
+  const [status, setStatus] = useState('idle')
+
+  const handleAddInterest = (e) => {
+    e.preventDefault()
+    if (newInterest.trim()) {
+      const newId = newInterest.toLowerCase().replace(/\s+/g, '')
+      setInterests([...interests, { id: newId, label: newInterest.trim() }])
+      setNewInterest('')
+    }
+  }
+
+  const handleRemoveInterest = (idToRemove) => {
+    setInterests(interests.filter(interest => interest.id !== idToRemove))
+    setSelectedInterests(selectedInterests.filter(id => id !== idToRemove))
+  }
 
   const handleSubscribe = async (planId) => {
     if (!session) {
       signIn()
       return
     }
-    // Handle subscription logic
-    console.log(`Subscribing to plan: ${planId}`)
+    setStatus('loading')
+    try {
+      // Add your subscription logic here
+      setStatus('success')
+    } catch (error) {
+      setStatus('error')
+      console.error('Subscription error:', error)
+    }
   }
 
   return (
-    <div className="container mx-auto px-4 py-20">
-      <h2 className="text-4xl font-playfair text-center text-[#d3ae8b] mb-4">
-        Choose Your Journey
-      </h2>
-      <p className="text-center text-[#d3ae8b]/80 mb-12 max-w-2xl mx-auto">
-        Unlock the mysteries of the universe with our flexible subscription plans.
-        Choose the perfect option for your spiritual journey.
-      </p>
+    <section className="py-20 bg-[#1d2a3a]">
+      <div className="container mx-auto px-4">
+        <h2 className="text-4xl font-playfair text-center text-[#d3ae8b] mb-4">
+          Choose Your Journey
+        </h2>
+        <p className="text-center text-[#d3ae8b] mb-12 max-w-2xl mx-auto">
+          Select the perfect plan for your spiritual journey
+        </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {plans.map((plan) => (
-          <motion.div
-            key={plan.id}
-            whileHover={{ y: -5 }}
-            className={`relative bg-[#2a3b4f] rounded-xl p-6 border-2 ${
-              plan.popular ? 'border-[#d3ae8b]' : 'border-[#d3ae8b]/20'
-            }`}
-          >
-            {plan.popular && (
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#d3ae8b] text-[#1d2a3a] px-4 py-1 rounded-full text-sm font-medium">
-                Most Popular
-              </div>
-            )}
-
-            <h3 className="text-xl font-playfair text-[#d3ae8b] mb-2">{plan.name}</h3>
-            <div className="text-3xl font-bold text-white mb-6">
-              ${plan.price}
-              <span className="text-sm font-normal text-[#d3ae8b]/60">
-                {plan.id === 'monthly' ? '/month' : plan.id === 'yearly' ? '/year' : ''}
-              </span>
-            </div>
-
-            <ul className="space-y-3 mb-8">
-              {plan.features.map((feature, index) => (
-                <li key={index} className="flex items-start gap-2 text-[#d3ae8b]/80">
-                  <span className="text-[#d3ae8b]">✦</span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-
-            <button
-              onClick={() => handleSubscribe(plan.id)}
-              className={`w-full py-3 rounded-lg transition-colors ${
-                plan.popular
-                  ? 'bg-[#d3ae8b] text-[#1d2a3a] hover:bg-[#d3ae8b]/90'
-                  : 'border border-[#d3ae8b] text-[#d3ae8b] hover:bg-[#d3ae8b] hover:text-[#1d2a3a]'
-              }`}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={`bg-transparent border border-[#d3ae8b] rounded-lg p-6`}
             >
-              Get Started
-            </button>
-          </motion.div>
-        ))}
+              <h3 className="text-xl font-semibold text-[#d3ae8b] mb-2">{plan.name}</h3>
+              <p className="text-3xl text-[#d3ae8b] mb-6">
+                ${plan.price}
+              </p>
+              <ul className="space-y-3 mb-8">
+                {plan.features.map((feature, index) => (
+                  <li key={index} className="flex items-center text-[#d3ae8b]">
+                    <span className="mr-2">✦</span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <Button
+                onClick={() => handleSubscribe(plan.name)}
+                disabled={status === 'loading'}
+                className="w-full bg-transparent hover:bg-transparent text-[#d3ae8b] border border-[#d3ae8b]"
+              >
+                {status === 'loading' ? 'Processing...' : 'Subscribe Now'}
+              </Button>
+            </div>
+          ))}
+        </div>
+
+        <div className="max-w-md mx-auto">
+          <h3 className="text-xl font-semibold text-[#d3ae8b] mb-4">Your Interests</h3>
+          
+          <form onSubmit={handleAddInterest} className="mb-6 flex gap-2">
+            <Input
+              type="text"
+              value={newInterest}
+              onChange={(e) => setNewInterest(e.target.value)}
+              placeholder="Add your interest..."
+              className="bg-transparent border-[#d3ae8b] text-[#d3ae8b] placeholder:text-[#d3ae8b]/50"
+            />
+            <Button 
+              type="submit"
+              className="bg-[#d3ae8b] hover:bg-[#d3ae8b]/80"
+            >
+              <PlusCircle className="h-4 w-4" />
+            </Button>
+          </form>
+
+          <div className="grid grid-cols-1 gap-3">
+            {interests.map((interest) => (
+              <div
+                key={interest.id}
+                className="flex items-center justify-between bg-[#2a3b4f] p-3 rounded-lg"
+              >
+                <label className="flex items-center space-x-2 text-[#d3ae8b]">
+                  <Checkbox
+                    checked={selectedInterests.includes(interest.id)}
+                    onCheckedChange={(checked) => {
+                      setSelectedInterests(prev =>
+                        checked
+                          ? [...prev, interest.id]
+                          : prev.filter(i => i !== interest.id)
+                      )
+                    }}
+                    className="border-[#d3ae8b]"
+                  />
+                  <span>{interest.label}</span>
+                </label>
+                {!defaultInterests.find(i => i.id === interest.id) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveInterest(interest.id)}
+                    className="text-[#d3ae8b] hover:text-[#d3ae8b]/80"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }

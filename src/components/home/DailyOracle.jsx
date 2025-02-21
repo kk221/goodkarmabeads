@@ -1,10 +1,12 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { zodiacSigns } from "../shared/ZodiacSigns"
 import { FortuneCard } from "./FortuneCard"
 import { Button } from "../ui/button"
 import { Sparkles } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 
 /**
  * @typedef {Object} DailyFortune
@@ -23,22 +25,47 @@ export default function DailyOracle() {
   const [dailyFortune, setDailyFortune] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [prediction, setPrediction] = useState("")
+  const [mounted, setMounted] = useState(false)
+
+  // Handle hydration issues
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const handleSignSelect = (sign) => {
+    setSelectedSign(sign)
+    if (dailyFortune && selectedSign === sign) {
+      return
+    }
+    setPrediction("")
+    setDailyFortune(null)
+    setIsModalOpen(false)
+  }
 
   const fetchHoroscope = async (sign) => {
     try {
       setIsLoading(true)
       setError(null)
-      setDailyFortune(null)
       
-      const response = await fetch(`/api/horoscope?sign=${sign}`)
+      const response = await fetch(`/api/horoscope?sign=${sign}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
       if (!response.ok) {
         throw new Error('Failed to fetch horoscope')
       }
+      
       const data = await response.json()
       setDailyFortune(data)
+      setPrediction(data.prediction || "The stars are aligning to reveal your destiny...")
       setIsModalOpen(true)
     } catch (err) {
       setError(err.message)
+      console.error('Horoscope fetch error:', err)
     } finally {
       setIsLoading(false)
     }
@@ -51,8 +78,14 @@ export default function DailyOracle() {
     }
   }
 
+  if (!mounted) {
+    return null // Prevent hydration issues
+  }
+
   return (
-    <div className="w-full max-w-2xl mx-auto p-4">
+    <div className="container mx-auto px-4">
+     
+
       <form onSubmit={handleSubmit} className="space-y-4" id="horoscopeForm" name="horoscopeForm">
         <fieldset>
           <legend className="sr-only">Choose your zodiac sign</legend>
@@ -65,7 +98,7 @@ export default function DailyOracle() {
                   name="zodiacSign"
                   value={zodiac.sign}
                   checked={selectedSign === zodiac.sign}
-                  onChange={(e) => setSelectedSign(e.target.value)}
+                  onChange={(e) => handleSignSelect(e.target.value)}
                   className="sr-only"
                   aria-label={`Select ${zodiac.name}`}
                 />
@@ -73,17 +106,10 @@ export default function DailyOracle() {
                   <Button
                     type="button"
                     variant={selectedSign === zodiac.sign ? "default" : "outline"}
-                    className={`
-                      flex flex-col items-center p-2 h-auto zodiac-button w-full
-                      ${selectedSign === zodiac.sign 
-                        ? 'bg-[#d3ae8b] text-[#1d2a3a]' 
-                        : 'bg-[#2a3b4f] text-[#d3ae8b]/80 hover:text-[#d3ae8b]'
-                      }
-                    `}
-                    onClick={() => setSelectedSign(zodiac.sign)}
-                    aria-pressed={selectedSign === zodiac.sign}
+                    className="w-full flex flex-col items-center p-2 h-auto bg-transparent text-[#d3ae8b] border-[#d3ae8b] hover:bg-transparent hover:border-[#d3ae8b] [&:not(:disabled)]:border-[#d3ae8b]"
+                    onClick={() => handleSignSelect(zodiac.sign)}
                   >
-                    <span className="text-xl" aria-hidden="true">{zodiac.symbol}</span>
+                    <span className="text-xl">{zodiac.symbol}</span>
                     <span className="text-xs mt-1">{zodiac.name}</span>
                     <span className="text-[10px] opacity-75 mt-0.5">{zodiac.dates}</span>
                   </Button>
@@ -93,29 +119,81 @@ export default function DailyOracle() {
           </div>
         </fieldset>
         
-        <Button 
-          type="submit" 
-          id="submitHoroscope"
-          name="submitHoroscope"
-          className={`
-            w-full max-w-md mx-auto mt-8 py-4 flex items-center justify-center gap-2
-            bg-[#d3ae8b] text-[#1d2a3a] hover:bg-[#d3ae8b]/90 
-            transition-all duration-300 ease-in-out
-            ${!selectedSign ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
-          `}
-          disabled={!selectedSign || isLoading}
-          aria-label="Get your daily fortune"
-        >
-          <Sparkles className={`w-5 h-5 ${isLoading ? 'animate-spin' : 'animate-pulse'}`} aria-hidden="true" />
-          <span className="text-lg font-medium">
-            {isLoading ? "Reading the stars..." : "Get Your Daily Fortune"}
-          </span>
-        </Button>
+        <div className="relative mt-8 flex justify-center">
+          <Button 
+            type="submit" 
+            id="submitHoroscope"
+            name="submitHoroscope"
+            onClick={handleSubmit}
+            className={`
+              relative z-10 w-full max-w-md py-6 px-8
+              bg-[#2a3b4f] hover:bg-[#2a3b4f]/90 
+              shadow-lg hover:shadow-xl
+              border-2 border-[#d3ae8b]/50
+              rounded-lg
+              transition-all duration-300 ease-in-out
+              ${!selectedSign ? 'opacity-50 cursor-not-allowed' : 'hover:scale-102 hover:translate-y-[-2px]'}
+            `}
+            disabled={!selectedSign || isLoading}
+            aria-label="Get your daily fortune"
+          >
+            <div className="flex items-center justify-center gap-3">
+              <Sparkles 
+                className={`w-6 h-6 text-[#d3ae8b] ${isLoading ? 'animate-spin' : 'animate-pulse'}`} 
+                aria-hidden="true"
+              />
+              <span className="text-xl font-bold text-[#d3ae8b]">
+                {isLoading ? "Reading the stars..." : "Get Your Daily Fortune"}
+              </span>
+            </div>
+          </Button>
+          
+          <div 
+            className={`
+              absolute inset-0 max-w-md mx-auto
+              bg-[#1d2a3a]/20 blur-md
+              transition-opacity duration-300
+              ${selectedSign ? 'opacity-100' : 'opacity-0'}
+            `}
+            aria-hidden="true"
+          />
+        </div>
       </form>
 
       {error && (
         <p role="alert" className="text-red-500 mt-4 text-center">{error}</p>
       )}
+
+      <AnimatePresence mode="wait">
+        {dailyFortune && isModalOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="mt-8"
+          >
+            <Card className="bg-[#2a3b4f] hover:bg-[#2a3b4f]/90 transition-colors duration-300">
+              <CardHeader>
+                <CardTitle className="text-2xl text-[#d3ae8b]">
+                  {selectedSign}'s Daily Oracle
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-[#d3ae8b]/90 mb-6 leading-relaxed">
+                  {prediction}
+                </p>
+                <Button
+                  className="w-full py-3 px-6 bg-[#2a3b4f] hover:bg-[#2a3b4f]/80 text-[#d3ae8b] 
+                    font-semibold rounded-lg transition-colors duration-300 border-2 border-[#d3ae8b]/50"
+                  onClick={() => fetchHoroscope(selectedSign)}
+                >
+                  Get New Prediction
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {dailyFortune && isModalOpen && (
         <FortuneCard

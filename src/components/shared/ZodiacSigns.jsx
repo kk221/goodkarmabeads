@@ -4,7 +4,11 @@ import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "/src/components/ui/card"
 import { zodiacSigns } from '../../lib/utils/zodiac-data'
 
-export default function ZodiacSigns() {
+export default function ZodiacSigns({ onSelectSign }) {
+  const handleSignClick = (sign) => {
+    onSelectSign?.(sign.name)
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {zodiacSigns.map((sign, index) => (
@@ -14,6 +18,8 @@ export default function ZodiacSigns() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
           whileHover={{ y: -5 }}
+          onClick={() => handleSignClick(sign)}
+          className="cursor-pointer"
         >
           <Card className="group hover:shadow-lg transition-shadow duration-300 overflow-hidden">
             <CardHeader className="relative overflow-hidden">

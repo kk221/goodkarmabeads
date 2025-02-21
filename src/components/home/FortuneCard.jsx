@@ -85,13 +85,13 @@ Get your reading at https://goodkarmabeads.com/
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="bg-[#2a3b4f] border-[#d3ae8b]/20 text-[#d3ae8b] modal-animation sm:max-w-[425px]">
+      <DialogContent className="bg-[#1d2a3a] border-[#d3ae8b] text-[#d3ae8b] modal-animation sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-playfair text-center flex items-center justify-center gap-2 text-[#d3ae8b]">
             <span className="text-3xl">{selectedZodiac?.symbol}</span>
             <span>{selectedZodiac?.name} Horoscope</span>
           </DialogTitle>
-          <p className="text-center text-[#d3ae8b]/80 text-sm">
+          <p className="text-center text-[#d3ae8b] text-sm">
             {fortune.date}
           </p>
         </DialogHeader>
@@ -99,7 +99,7 @@ Get your reading at https://goodkarmabeads.com/
         <div id="fortune-card" className="space-y-6 p-4">
           <div>
             <h3 className="text-lg font-semibold mb-2 text-[#d3ae8b]">Daily Horoscope</h3>
-            <p className="text-[#d3ae8b]/80">{fortune.zodiacInfluence}</p>
+            <p className="text-[#d3ae8b]">{fortune.zodiacInfluence}</p>
           </div>
 
           {fortune.positiveEnergies?.length > 0 && (
@@ -109,7 +109,7 @@ Get your reading at https://goodkarmabeads.com/
                 {fortune.positiveEnergies.map((energy, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-[#1d2a3a] text-[#d3ae8b] rounded-full text-sm capitalize"
+                    className="px-3 py-1 bg-transparent border border-[#d3ae8b] text-[#d3ae8b] rounded-full text-sm capitalize"
                   >
                     {energy}
                   </span>
@@ -120,25 +120,25 @@ Get your reading at https://goodkarmabeads.com/
 
           <div>
             <h3 className="text-lg font-semibold mb-2 text-[#d3ae8b]">Focus Point</h3>
-            <p className="text-[#d3ae8b]/80">{fortune.awareness}</p>
+            <p className="text-[#d3ae8b]">{fortune.awareness}</p>
           </div>
         </div>
 
         <div className="flex justify-center gap-4 mt-6">
           <Button
             onClick={handleDownload}
-            className="bg-[#1d2a3a] text-[#d3ae8b] hover:bg-[#1d2a3a]/80 border-[#d3ae8b]/20"
+            className="bg-transparent text-[#d3ae8b] hover:bg-transparent border-[#d3ae8b]"
             variant="outline"
           >
-            <Download size={16} />
+            <Download size={16} className="mr-2" />
             Download
           </Button>
           <Button
             onClick={() => setIsShareModalOpen(true)}
-            className="bg-[#1d2a3a] text-[#d3ae8b] hover:bg-[#1d2a3a]/80 border-[#d3ae8b]/20"
+            className="bg-transparent text-[#d3ae8b] hover:bg-transparent border-[#d3ae8b]"
             variant="outline"
           >
-            <Share2 size={16} />
+            <Share2 size={16} className="mr-2" />
             Share
           </Button>
         </div>
